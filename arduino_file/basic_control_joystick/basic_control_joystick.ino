@@ -40,7 +40,7 @@ int servoPin = 16; // Setup Servo Pin
 #endif
 void setup() {
   Serial.begin(115200);
-  Ps3.begin("78:E3:6D:DD:D4:22");  // configurate MAC address of Joystick and ESP32 (Install SixaxisPairTool for equipment mapping) https://www.filehorse.com/download-sixaxispairtool/ 
+  Ps3.begin("d0:c6:37:a6:a6:16");  // configurate MAC address of Joystick and ESP32 (Install SixaxisPairTool for equipment mapping) https://www.filehorse.com/download-sixaxispairtool/ 
   Serial.println("Ready.");
   // Set motor controller pins as outputs
   pinMode(motorLeft_A, OUTPUT);          //  Pin motorA_IN1 as OUTPUT
