@@ -39,7 +39,7 @@ const int motorRight_A = 15;
 const int motorRight_B = 13;
 
 const int max_speed = 255;
-const int max_turn = 30;
+const int max_turn = 35;
 const int DEADZONE = 20;  // ignore small joystick drift
 
 Servo myservo;
@@ -47,20 +47,18 @@ const int servoPin = 16;
 
 //---------------------Driving Functions---------------------
 
-void Forward(int speed = 512){
-  speed = map(speed, 0, 512, 0, max_speed);
-  analogWrite(motorLeft_A, speed);  
+void Forward(){
+  analogWrite(motorLeft_A, max_speed);  
   analogWrite(motorLeft_B, 0);     
-  analogWrite(motorRight_A, speed);
+  analogWrite(motorRight_A, max_speed);
   analogWrite(motorRight_B, 0);
 }
 
-void Backward(int speed = 512){
-  speed = map(speed, 0, 512, 0, max_speed);
+void Backward(){
   analogWrite(motorLeft_A, 0);     
-  analogWrite(motorLeft_B, speed); 
+  analogWrite(motorLeft_B, max_speed); 
   analogWrite(motorRight_A, 0);
-  analogWrite(motorRight_B, speed);
+  analogWrite(motorRight_B, max_speed);
 }
 
 void StopMotors(){
@@ -110,13 +108,11 @@ void loop() {
     int y = myController->axisY();   // forward/backward
     int rx = myController->axisRX(); // steering
 
-    // Forward/backward with deadzone
-    if (y < -DEADZONE) Forward(-y);
-    else if (y > DEADZONE) Backward(y);
-    else if(myController->dpad() == DPAD_UP) Forward();
-    else if(myController->dpad() == DPAD_DOWN) Backward();
-    else StopMotors();
-    
+    switch (myController->dpad()) {
+      case DPAD_UP: Forward(); break;
+      case DPAD_DOWN: Backward(); break;
+      default: StopMotors(); break;
+    }
 
     // Steering with deadzone
     if (abs(rx) < DEADZONE) rx = 0;
