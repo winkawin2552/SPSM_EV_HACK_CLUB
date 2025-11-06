@@ -29,6 +29,13 @@ void Forward(int speed){
   analogWrite(motorRight_B, 0);
 }
 
+void Stop(){
+  analogWrite(motorLeft_A, 0);  
+  analogWrite(motorLeft_B, 0);     
+  analogWrite(motorRight_A, 0);
+  analogWrite(motorRight_B, 0);
+}
+
 int normal_speed = 80;
 int max_speed = 100;
 int min_speed = 60;
@@ -51,6 +58,7 @@ void start_screen(){
 
 void setup() {
   Serial.begin(115200);
+  pinMode(0, INPUT_PULLUP); 
   
   // Initialize I2C on SDA=5, SCL=4
   Wire.begin(5, 4);
@@ -100,36 +108,49 @@ void show_data(float busVoltage, float current_mA, float power_mW){
   display.display();
 }
 
+bool is_run = false;
+
 void loop() {
   float busVoltage = ina219.getBusVoltage_V();  // Voltage (V)
   float current_mA = ina219.getCurrent_mA();    // Current (mA)
   float power_mW = ina219.getPower_mW();        // Power (mW)
   show_data(busVoltage, current_mA, power_mW );
 
-  int16_t ax, ay, az;
-  int16_t gx, gy, gz;
-  int light_val = analogRead(light_sensor);
+  if(digitalRead(0) == 0){
+    is_run = !is_run;
+    delay(300);
+  }
 
-  // Read raw values
-  mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+  if (is_run){
+    int16_t ax, ay, az;
+    int16_t gx, gy, gz;
+    int light_val = analogRead(light_sensor);
 
-  // Convert to acceleration in g and gyro in deg/s (approx)
-  float accelX = ax / 16384.0;
-  float accelY = ay / 16384.0;
-  float accelZ = az / 16384.0;
+    // Read raw values
+    mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
 
-  float gyroX = gx / 131.0;
-  float gyroY = gy / 131.0;
-  float gyroZ = gz / 131.0;
+    // Convert to acceleration in g and gyro in deg/s (approx)
+    float accelX = ax / 16384.0;
+    float accelY = ay / 16384.0;
+    float accelZ = az / 16384.0;
 
-  int speed;
-  if(light_val < 100){ speed = min_speed; }
-  else if( accelX > 0.22 ) { speed = max_speed; }
-  else if( accelX < -0.22 ) { speed = min_speed; }
-  else { speed = normal_speed; }
-  myservo.write(set_servo);
+    float gyroX = gx / 131.0;
+    float gyroY = gy / 131.0;
+    float gyroZ = gz / 131.0;
 
-  Forward(speed = speed);
+    int speed;
+    if(light_val < 100){ speed = min_speed; }
+    else if( accelX > 0.22 ) { speed = max_speed; }
+    else if( accelX < -0.22 ) { speed = min_speed; }
+    else { speed = normal_speed; }
+    myservo.write(set_servo);
+
+    Forward(speed = speed);
+  }else{
+    Stop();
+  }
+
+}
 
   // Serial.print("Light (LX): ");
   // Serial.print(light_val); Serial.print(", ");
@@ -141,6 +162,3 @@ void loop() {
   // Serial.print(gyroX); Serial.print(", ");
   // Serial.print(gyroY); Serial.print(", ");
   // Serial.println(gyroZ);
-
-  delay(500);
-}
