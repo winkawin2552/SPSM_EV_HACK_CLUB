@@ -39,7 +39,7 @@ void Stop(){
 int normal_speed = 80;
 int max_speed = 100;
 int min_speed = 60;
-int set_servo = 90;
+int set_servo = 89;
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 void start_screen(){
@@ -139,12 +139,11 @@ void loop() {
     float gyroZ = gz / 131.0;
 
     int speed;
-    if(light_val < 100){ speed = min_speed; }
-    else if( accelX > 0.22 ) { speed = max_speed; }
-    else if( accelX < -0.22 ) { speed = min_speed; }
+    if(light_val < 20){ speed = min_speed; }
+    else if( accelX > 0.08 ) { speed = max_speed; }
+    else if( accelX < -0.07 ) { speed = min_speed; }
     else { speed = normal_speed; }
     myservo.write(set_servo);
-
     Forward(speed = speed);
   }else{
     Stop();

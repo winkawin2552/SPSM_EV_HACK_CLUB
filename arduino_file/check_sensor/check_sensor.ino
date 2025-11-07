@@ -72,5 +72,4 @@ void loop() {
   Serial.print(power_mW);
   Serial.println(" mW");
 
-  delay(500);
 }
